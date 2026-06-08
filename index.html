@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>БИЛ Логика v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f0f4ff;--card:#fff;--primary:#4361ee;--pd:#3451d1;
+  --sec:#f72585;--green:#06d6a0;--gd:#05a880;--red:#ef233c;
+  --yellow:#ffbe0b;--orange:#fb5607;--purple:#7209b7;
+  --text:#1a1a2e;--text2:#4a4a6a;--text3:#8888aa;--border:#dde2f5;
+  --sh:0 4px 24px rgba(67,97,238,.10);--shl:0 8px 40px rgba(67,97,238,.18);
+  --r:18px;--fh:'Baloo 2',cursive;--fb:'Nunito',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);font-family:var(--fb);color:var(--text);min-height:100vh}
+.app{max-width:860px;margin:0 auto;padding:14px}
+.hidden{display:none!important}
+
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--card);border-radius:var(--r);box-shadow:var(--sh);margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.logo{font-family:var(--fh);font-size:20px;font-weight:800;color:var(--primary)}
+.logo span{color:var(--sec)}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nav-btn{padding:6px 14px;border-radius:40px;border:2px solid var(--border);background:transparent;font-family:var(--fb);font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .2s}
+.nav-btn:hover,.nav-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.lang-toggle{display:flex;background:var(--bg);border-radius:30px;padding:3px;border:2px solid var(--border)}
+.lang-btn{padding:4px 12px;border-radius:20px;border:none;font-family:var(--fb);font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--text3);transition:all .2s}
+.lang-btn.active{background:var(--primary);color:#fff}
+.profile-chip{display:flex;align-items:center;gap:6px;background:var(--bg);border:2px solid var(--border);border-radius:30px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer}
+.profile-avatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px}
+
+/* CARD */
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:24px;margin-bottom:14px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 24px;border-radius:40px;border:none;font-family:var(--fb);font-size:14px;font-weight:800;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 16px rgba(67,97,238,.3)}
+.btn-primary:hover{background:var(--pd);transform:translateY(-2px)}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 4px 16px rgba(6,214,160,.3)}
+.btn-green:hover{background:var(--gd);transform:translateY(-2px)}
+.btn-secondary{background:var(--bg);color:var(--primary);border:2px solid var(--primary)}
+.btn-secondary:hover{background:var(--primary);color:#fff}
+.btn-danger{background:#fee2e2;color:var(--red);border:2px solid #fca5a5}
+.btn-sm{padding:8px 18px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+
+/* PROFILE SETUP */
+.setup-hero{text-align:center;padding:24px 0}
+.setup-hero h1{font-family:var(--fh);font-size:28px;font-weight:800;color:var(--primary);margin-bottom:8px}
+.avatar-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:16px 0}
+.avatar-opt{font-size:32px;text-align:center;padding:10px;border-radius:14px;border:3px solid var(--border);cursor:pointer;transition:all .2s}
+.avatar-opt:hover,.avatar-opt.sel{border-color:var(--primary);background:#eef2ff;transform:scale(1.1)}
+.input-field{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:12px;font-family:var(--fb);font-size:15px;font-weight:600;color:var(--text);outline:none;transition:border .2s}
+.input-field:focus{border-color:var(--primary)}
+
+/* PROFILE SWITCHER */
+.profiles-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.profile-row{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg);border-radius:14px;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.profile-row:hover,.profile-row.sel{border-color:var(--primary);background:#eef2ff}
+.pr-avatar{font-size:28px;width:46px;height:46px;background:var(--card);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh)}
+.pr-name{font-family:var(--fh);font-size:15px;font-weight:800}
+.pr-stats{font-size:12px;color:var(--text3);margin-top:2px}
+.pr-del{margin-left:auto;background:none;border:none;font-size:18px;cursor:pointer;opacity:.4;transition:opacity .2s}
+.pr-del:hover{opacity:1}
+
+/* HOME */
+.home-hero{text-align:center;padding:20px 0 24px}
+.home-hero h1{font-family:var(--fh);font-size:26px;font-weight:800;color:var(--primary);margin-bottom:6px}
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+.topic-card{background:var(--card);border:3px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s;position:relative;text-align:left}
+.topic-card:hover{border-color:var(--primary);box-shadow:var(--shl);transform:translateY(-3px)}
+.topic-card.selected{border-color:var(--primary);background:#eef2ff}
+.topic-icon{font-size:30px;margin-bottom:7px}
+.topic-name{font-family:var(--fh);font-size:13px;font-weight:700;margin-bottom:3px}
+.topic-desc{font-size:11px;color:var(--text3)}
+.weak-badge{position:absolute;top:8px;right:8px;background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px}
+.score-bar{height:4px;background:var(--border);border-radius:4px;margin-top:7px;overflow:hidden}
+.score-fill{height:100%;border-radius:4px;background:var(--green);transition:width .5s}
+.score-fill.low{background:var(--red)}.score-fill.mid{background:var(--yellow)}
+
+/* TIMER */
+.timer-bar-wrap{background:var(--bg);border-radius:10px;overflow:hidden;height:10px;margin-bottom:14px}
+.timer-bar{height:100%;border-radius:10px;transition:width 1s linear,background .5s;background:var(--green)}
+.timer-bar.warn{background:var(--yellow)}
+.timer-bar.danger{background:var(--red)}
+.timer-text{font-family:var(--fh);font-size:16px;font-weight:800;text-align:right;margin-bottom:4px}
+.timer-text.warn{color:var(--orange)}
+.timer-text.danger{color:var(--red)}
+
+/* QUESTION */
+.q-progress{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.progress-bar{flex:1;height:9px;background:var(--border);border-radius:9px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--sec));border-radius:9px;transition:width .4s}
+.progress-text{font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap}
+.q-badges{margin-bottom:8px}
+.topic-badge{display:inline-block;background:#eef2ff;color:var(--primary);font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px}
+.diff-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-left:5px}
+.diff-easy{background:#d1fae5;color:#065f46}.diff-medium{background:#fef3c7;color:#92400e}.diff-hard{background:#fee2e2;color:#991b1b}
+.q-text{font-family:var(--fh);font-size:18px;font-weight:700;color:var(--text);margin-bottom:16px;line-height:1.4}
+.drawing-area{display:flex;justify-content:center;margin-bottom:18px;background:var(--bg);border-radius:14px;padding:14px}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px}
+.opt-btn{padding:13px 14px;border:3px solid var(--border);border-radius:14px;background:var(--card);font-family:var(--fb);font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:all .2s;text-align:left;display:flex;align-items:center;gap:9px}
+.opt-btn:hover:not(:disabled){border-color:var(--primary);background:#eef2ff}
+.opt-btn.selected{border-color:var(--primary);background:#eef2ff;color:var(--primary)}
+.opt-btn.correct{border-color:var(--green);background:#d1fae5;color:#065f46}
+.opt-btn.wrong{border-color:var(--red);background:#fee2e2;color:#991b1b}
+.opt-btn:disabled{cursor:default}
+.opt-letter{width:26px;height:26px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.exp-box{border-radius:14px;padding:16px;margin-top:12px;animation:fadeIn .3s}
+.exp-box.ok{background:#d1fae5;border:2px solid #6ee7b7}
+.exp-box.ng{background:#fef3c7;border:2px solid #fcd34d}
+.exp-box.timeout{background:#fee2e2;border:2px solid #fca5a5}
+.exp-title{font-family:var(--fh);font-size:14px;font-weight:800;margin-bottom:7px}
+.exp-text{font-size:13px;line-height:1.65}
+
+/* RESULT */
+.result-hero{text-align:center;padding:16px 0 24px}
+.score-circle{width:130px;height:130px;border-radius:50%;margin:0 auto 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--fh)}
+.score-circle-bg{background:conic-gradient(var(--green) calc(var(--pct)*3.6deg),var(--border) 0)}
+.score-number{font-size:34px;font-weight:800}
+.score-label{font-size:12px;font-weight:700;color:var(--text2)}
+.result-title{font-family:var(--fh);font-size:24px;font-weight:800;margin-bottom:5px}
+.result-sub{color:var(--text2);font-size:14px}
+.rv-grid{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.rv-item{border-radius:12px;padding:12px 14px;border:2px solid}
+.rv-correct{border-color:#6ee7b7;background:#d1fae5}
+.rv-wrong{border-color:#fca5a5;background:#fee2e2}
+.rv-timeout{border-color:#d1d5db;background:#f9fafb}
+.rv-q{font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px}
+.rv-ans{font-size:11px;color:var(--text2)}
+.weak-box{background:#fff7ed;border:2px solid #fed7aa;border-radius:14px;padding:14px;margin-top:6px}
+.weak-box h3{font-family:var(--fh);font-size:14px;font-weight:800;color:var(--orange);margin-bottom:8px}
+.weak-chip{display:inline-block;background:#fed7aa;color:#9a3412;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin:2px}
+
+/* PROGRESS */
+.section-title{font-family:var(--fh);font-size:18px;font-weight:800;margin-bottom:14px}
+.pt-row{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:12px;margin-bottom:8px}
+.pt-icon{font-size:22px}
+.pt-info{flex:1}
+.pt-name{font-size:13px;font-weight:700}
+.pt-stats{font-size:11px;color:var(--text3);margin-top:1px}
+.pt-bar{height:7px;background:var(--border);border-radius:7px;overflow:hidden;margin-top:5px}
+.pt-fill{height:100%;border-radius:7px;background:var(--green)}
+.pt-fill.low{background:var(--red)}.pt-fill.mid{background:var(--yellow)}
+.pt-pct{font-size:13px;font-weight:800;color:var(--text2);min-width:38px;text-align:right}
+.hist-item{padding:11px 14px;background:var(--bg);border-radius:12px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
+.hist-score{font-family:var(--fh);font-size:17px;font-weight:800}
+.hist-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.empty-state{text-align:center;padding:36px;color:var(--text3);font-size:14px}
+.empty-state span{font-size:44px;display:block;margin-bottom:10px}
+
+/* PARENT MODE */
+.parent-header{background:linear-gradient(135deg,#1a1a2e,#4361ee);color:#fff;border-radius:var(--r);padding:22px 24px;margin-bottom:14px}
+.parent-header h2{font-family:var(--fh);font-size:22px;font-weight:800;margin-bottom:4px}
+.parent-header p{font-size:13px;opacity:.8}
+.analytics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.an-card{background:var(--card);border-radius:14px;padding:16px;box-shadow:var(--sh);text-align:center}
+.an-num{font-family:var(--fh);font-size:28px;font-weight:800;color:var(--primary)}
+.an-label{font-size:11px;color:var(--text3);margin-top:3px}
+.child-selector{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.child-chip{padding:7px 16px;border-radius:30px;border:2px solid var(--border);background:var(--card);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.child-chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.trend-bar{display:flex;align-items:flex-end;gap:4px;height:80px;margin-top:10px}
+.trend-col{flex:1;border-radius:6px 6px 0 0;background:var(--primary);opacity:.7;min-height:4px;transition:height .5s;position:relative}
+.trend-col:hover{opacity:1}
+.trend-label{font-size:9px;color:var(--text3);text-align:center;margin-top:4px}
+.recommendation{background:#eef2ff;border-radius:12px;padding:14px 16px;margin-top:10px;border-left:4px solid var(--primary)}
+.rec-title{font-size:13px;font-weight:800;color:var(--primary);margin-bottom:5px}
+.rec-text{font-size:12px;color:var(--text2);line-height:1.6}
+
+/* ANIMATIONS */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{0%{transform:scale(.8)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+.animate-pop{animation:pop .35s ease}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse{animation:pulse 1s ease infinite}
+
+@media(max-width:600px){
+  .opts-grid{grid-template-columns:1fr}
+  .topic-grid{grid-template-columns:1fr 1fr}
+  .analytics-grid{grid-template-columns:1fr 1fr}
+  .q-text{font-size:15px}
+}
+</style>
+<script src="questions1.js"></script>
+<script src="questions2.js"></script>
+<script src="questions3.js"></script>
+</head>
+<body>
+<div class="app" id="app">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">БИЛ <span>Логика</span> <span style="font-size:13px;opacity:.6">v2</span></div>
+  <div class="header-right">
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="lang-kk" onclick="setLang('kk')">ҚАЗ</button>
+      <button class="lang-btn" id="lang-ru" onclick="setLang('ru')">РУС</button>
+    </div>
+    <div class="profile-chip" onclick="showScreen('profiles')" id="profile-chip">
+      <div class="profile-avatar" id="header-avatar">👤</div>
+      <span id="header-name">—</span>
+    </div>
+    <button class="nav-btn" id="nav-home" onclick="showScreen('home')">🏠</button>
+    <button class="nav-btn" id="nav-progress" onclick="showScreen('progress')">📊</button>
+    <button class="nav-btn" id="nav-parent" onclick="showScreen('parent')">👨‍👩‍👧</button>
+  </div>
+</div>
+
+<!-- PROFILE SETUP SCREEN -->
+<div id="screen-setup">
+  <div class="card">
+    <div class="setup-hero">
+      <div style="font-size:52px;margin-bottom:10px">🌟</div>
+      <h1 id="t-setup-title">Профиль жасау</h1>
+      <p id="t-setup-sub" style="color:var(--text2);margin-top:6px">Атыңды жаз және аватар таңда</p>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:6px" id="t-name-label">Аты-жөні</label>
+      <input class="input-field" id="setup-name" placeholder="Мысалы: Айбол" maxlength="20"/>
+    </div>
+    <div>
+      <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:8px" id="t-avatar-label">Аватар</label>
+      <div class="avatar-grid" id="avatar-grid"></div>
+    </div>
+    <div class="btn-row" style="justify-content:center">
+      <button class="btn btn-primary" id="btn-create-profile" onclick="createProfile()">✅ <span id="t-create-btn">Жасау</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILES SCREEN -->
+<div id="screen-profiles" class="hidden">
+  <div class="card">
+    <div class="section-title" id="t-profiles-title">👥 Профильдер</div>
+    <div class="profiles-list" id="profiles-list"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-sm" onclick="showScreen('setup')">+ <span id="t-add-profile">Жаңа профиль</span></button>
+      <button class="btn btn-secondary btn-sm" onclick="showScreen('home')" id="btn-back-home">← <span id="t-back">Артқа</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- HOME SCREEN -->
+<div id="screen-home" class="hidden">
+  <div class="card">
+    <div class="home-hero">
+      <div style="font-size:48px;margin-bottom:10px" id="home-avatar">🧠</div>
+      <h1 id="home-greeting">Сәлем!</h1>
+      <p id="t-home-sub" style="color:var(--text2);font-size:14px;margin-bottom:20px">Тақырыпты таңда немесе аралас тест өт</p>
+    </div>
+    <div class="topic-grid" id="topic-grid"></div>
+    <div class="btn-row" style="justify-content:center">
+      <button class="btn btn-primary" onclick="startTest('mixed')">🎲 <span id="t-mixed">Аралас тест</span></button>
+      <button class="btn btn-secondary" id="btn-start-sel" onclick="startSelectedTopics()" disabled>✅ <span id="t-start-sel">Таңдалғандар</span></button>
+      <button class="btn btn-green" onclick="startDailyTest()" style="background:linear-gradient(135deg,#f72585,#7209b7)">🏆 <span id="t-daily">БИЛ күндік тест (60 сұрақ)</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- TEST SCREEN -->
+<div id="screen-test" class="hidden">
+  <div class="card">
+    <div id="timer-text" class="timer-text"></div>
+    <div class="timer-bar-wrap"><div class="timer-bar" id="timer-bar"></div></div>
+    <div class="q-progress">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="progress-text" id="progress-text">1/10</div>
+    </div>
+    <div class="q-badges">
+      <span class="topic-badge" id="q-topic-badge"></span>
+      <span class="diff-badge" id="q-diff-badge"></span>
+    </div>
+    <div class="q-text" id="q-text"></div>
+    <div class="drawing-area" id="drawing-area" style="display:none"></div>
+    <div class="opts-grid" id="opts-grid"></div>
+    <div id="exp-box" class="hidden"></div>
+    <div class="btn-row">
+      <button class="btn btn-green hidden" id="btn-next" onclick="nextQuestion()">→ <span id="t-next">Келесі</span></button>
+      <button class="btn btn-primary hidden" id="btn-finish" onclick="showResults()">📋 <span id="t-finish">Нәтиже</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="screen-result" class="hidden">
+  <div class="card">
+    <div class="result-hero" id="result-hero"></div>
+  </div>
+  <div class="card" id="result-weak" style="display:none"></div>
+  <div class="card">
+    <div class="section-title" id="t-review-title">📝 Жауаптарды қарау</div>
+    <div class="rv-grid" id="rv-grid"></div>
+  </div>
+  <div class="btn-row" style="justify-content:center">
+    <button class="btn btn-primary" onclick="showScreen('home')">🏠</button>
+    <button class="btn btn-green" id="btn-retry" onclick="retryWeak()">🔁 <span id="t-retry">Қайталау</span></button>
+  </div>
+</div>
+
+<!-- PROGRESS SCREEN -->
+<div id="screen-progress" class="hidden">
+  <div class="card">
+    <div class="section-title" id="t-progress-title">📊 Менің нәтижелерім</div>
+    <div id="progress-content"></div>
+  </div>
+  <div class="card">
+    <div class="section-title" id="t-history-title">🕐 Тест тарихы</div>
+    <div id="history-content"></div>
+  </div>
+</div>
+
+<!-- PARENT SCREEN -->
+<div id="screen-parent" class="hidden">
+  <div class="parent-header">
+    <h2>👨‍👩‍👧 <span id="t-parent-title">Ата-ана бөлімі</span></h2>
+    <p id="t-parent-sub">Балалардың үлгерімін бақылаңыз</p>
+  </div>
+  <div class="card">
+    <div class="section-title" id="t-child-select">Баланы таңда:</div>
+    <div class="child-selector" id="child-selector"></div>
+    <div id="parent-analytics"></div>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<script>
+// ============================================================
+// I18N
+// ============================================================
+const T = {
+  kk:{
+    'setup-title':'Профиль жасау','setup-sub':'Атыңды жаз және аватар таңда',
+    'name-label':'Аты-жөні','avatar-label':'Аватар','create-btn':'Жасау',
+    'profiles-title':'👥 Профильдер','add-profile':'Жаңа профиль','back':'Артқа',
+    'home-sub':'Тақырыпты таңда немесе аралас тест өт',
+    'mixed':'Аралас тест','start-sel':'Таңдалғандар',
+    'next':'Келесі','finish':'Нәтиже',
+    'review-title':'📝 Жауаптарды қарау','retry':'Қайталау',
+    'progress-title':'📊 Менің нәтижелерім','history-title':'🕐 Тест тарихы',
+    'parent-title':'Ата-ана бөлімі','parent-sub':'Балалардың үлгерімін бақылаңыз',
+    'child-select':'Баланы таңда:',
+    'greeting':'Сәлем','correct':'Дұрыс','wrong':'Қате',
+    'timeout-msg':'Уақыт бітті!','timeout-exp':'Уақытты дұрыс бөлуді үйрен',
+    'diff-easy':'жеңіл','diff-medium':'орташа','diff-hard':'қиын',
+    'total-tests':'Тест саны','avg-score':'Орт. нәтиже','best-score':'Ең жақсы',
+    'weak-topics':'Әлсіз тақырыптар','no-data':'Деректер жоқ',
+    'recommend':'Ұсыным','empty-tests':'Әлі тест өтпеген',
+  },
+  ru:{
+    'setup-title':'Создать профиль','setup-sub':'Введи имя и выбери аватар',
+    'name-label':'Имя','avatar-label':'Аватар','create-btn':'Создать',
+    'profiles-title':'👥 Профили','add-profile':'Новый профиль','back':'Назад',
+    'home-sub':'Выбери тему или пройди смешанный тест',
+    'mixed':'Смешанный тест','start-sel':'Выбранные темы',
+    'next':'Далее','finish':'Результат',
+    'review-title':'📝 Разбор ответов','retry':'Повторить',
+    'progress-title':'📊 Мои результаты','history-title':'🕐 История тестов',
+    'parent-title':'Раздел для родителей','parent-sub':'Следите за успехами ребёнка',
+    'child-select':'Выбери ребёнка:',
+    'greeting':'Привет','correct':'Правильно','wrong':'Ошибка',
+    'timeout-msg':'Время вышло!','timeout-exp':'Учись распределять время',
+    'diff-easy':'лёгкий','diff-medium':'средний','diff-hard':'сложный',
+    'total-tests':'Тестов','avg-score':'Ср. балл','best-score':'Лучший',
+    'weak-topics':'Слабые темы','no-data':'Нет данных',
+    'recommend':'Рекомендация','empty-tests':'Тесты ещё не пройдены',
+  }
+};
+
+let lang = 'kk';
+function t(key){ return (T[lang]||T.kk)[key]||key; }
+function setLang(l){
+  lang=l;
+  saveAll();
+  document.getElementById('lang-kk').classList.toggle('active',l==='kk');
+  document.getElementById('lang-ru').classList.toggle('active',l==='ru');
+  applyTranslations();
+  if(currentScreen==='home') renderHome();
+  else if(currentScreen==='progress') renderProgress();
+  else if(currentScreen==='parent') renderParent();
+}
+function applyTranslations(){
+  const ids=['setup-title','setup-sub','name-label','avatar-label','create-btn',
+    'profiles-title','add-profile','back','home-sub','mixed','start-sel',
+    'next','finish','review-title','retry','progress-title','history-title',
+    'parent-title','parent-sub','child-select','t-back'];
+  ids.forEach(id=>{
+    const el=document.getElementById('t-'+id)||document.querySelector(`[id="t-${id}"] span`);
+    if(el) el.textContent=t(id);
+  });
+  // span targets
+  ['mixed','start-sel','next','finish','retry','add-profile','back','create-btn'].forEach(id=>{
+    const el=document.getElementById('t-'+id);
+    if(el) el.textContent=t(id);
+  });
+  document.getElementById('t-setup-title').textContent=t('setup-title');
+  document.getElementById('t-setup-sub').textContent=t('setup-sub');
+  document.getElementById('t-name-label').textContent=t('name-label');
+  document.getElementById('t-avatar-label').textContent=t('avatar-label');
+  document.getElementById('t-profiles-title').textContent=t('profiles-title');
+  document.getElementById('t-home-sub').textContent=t('home-sub');
+  document.getElementById('t-review-title').textContent=t('review-title');
+  document.getElementById('t-progress-title').textContent=t('progress-title');
+  document.getElementById('t-history-title').textContent=t('history-title');
+  document.getElementById('t-parent-title').textContent=t('parent-title');
+  document.getElementById('t-parent-sub').textContent=t('parent-sub');
+  document.getElementById('t-child-select').textContent=t('child-select');
+}
+
+// ============================================================
+// TOPICS & QUESTIONS
+// ============================================================
+const TOPICS = {
+  kk:[
+    {id:'cubes',   name:'Кубтарды санау',           icon:'🧊',desc:'Жасырын кубиктер'},
+    {id:'nets',    name:'Куб жазбалары',             icon:'📦',desc:'Жазылма және беттер'},
+    {id:'fill',    name:'Параллелепипед',            icon:'📐',desc:'Жетіспейтін кубиктер'},
+    {id:'perim',   name:'Периметр',                  icon:'📏',desc:'Күрделі фигура'},
+    {id:'squares', name:'Квадраттарды санау',        icon:'⬛',desc:'Торда квадраттар'},
+    {id:'euler',   name:'Жиындар / Эйлер',           icon:'🔵',desc:'Қиылысу есептері'},
+    {id:'logic',   name:'Логикалық ойлау',           icon:'🧩',desc:'БИЛ логика тапсырмалары'},
+    {id:'pattern', name:'Заңдылықтар',               icon:'🔷',desc:'Қатарды жалғастыр'},
+    {id:'math',    name:'Математика (БИЛ)',           icon:'🔢',desc:'Салмақ, ауданы, жылдамдық'},
+    {id:'reading', name:'Оқу сауаттылығы',           icon:'📖',desc:'Мәтінді түсіну'},
+  ],
+  ru:[
+    {id:'cubes',   name:'Подсчёт кубиков',          icon:'🧊',desc:'Скрытые кубики'},
+    {id:'nets',    name:'Развёртки куба',            icon:'📦',desc:'Развёртка и грани'},
+    {id:'fill',    name:'Параллелепипед',            icon:'📐',desc:'Недостающие кубики'},
+    {id:'perim',   name:'Периметр',                  icon:'📏',desc:'Сложная фигура'},
+    {id:'squares', name:'Подсчёт квадратов',         icon:'⬛',desc:'Квадраты в сетке'},
+    {id:'euler',   name:'Множества / Эйлер',         icon:'🔵',desc:'Пересечения множеств'},
+    {id:'logic',   name:'Логическое мышление',       icon:'🧩',desc:'Задачи из БИЛ'},
+    {id:'pattern', name:'Закономерности',            icon:'🔷',desc:'Продолжи ряд'},
+    {id:'math',    name:'Математика (БИЛ)',           icon:'🔢',desc:'Весы, площади, скорость'},
+    {id:'reading', name:'Читательская грамотность',  icon:'📖',desc:'Понимание текста'},
+  ]
+};
+
+function getTopics(){ return TOPICS[lang]||TOPICS.kk; }
+
+// SVG helpers
+function svgCubeStack(total, hidden){
+  const pos=[[70,110],[110,110],[150,110],[70,88],[110,88],[150,88],[70,66],[110,66],[150,66],[90,44],[130,44]];
+  let g='';
+  for(let i=0;i<Math.min(total,11);i++){
+    const [cx,cy]=pos[i]||[70+i*40,110];
+    const vis=i<(total-hidden);
+    const f=vis?'#4361ee':'#c7d2fe';
+    const fl=vis?'#2d4cc8':'#a5b4fc';
+    const fd=vis?'#6b85f5':'#ddd6fe';
+    g+=`<polygon points="${cx},${cy-20} ${cx+20},${cy-10} ${cx},${cy} ${cx-20},${cy-10}" fill="${fd}" stroke="#fff" stroke-width="1.5"/>
+    <polygon points="${cx-20},${cy-10} ${cx},${cy} ${cx},${cy+20} ${cx-20},${cy+10}" fill="${f}" stroke="#fff" stroke-width="1.5"/>
+    <polygon points="${cx},${cy} ${cx+20},${cy-10} ${cx+20},${cy+10} ${cx},${cy+20}" fill="${fl}" stroke="#fff" stroke-width="1.5"/>`;
+  }
+  return `<svg viewBox="0 0 240 160" width="220" height="150">${g}</svg>`;
+}
+
+function svgNet(type){
+  const cfgs=[
+    [[1,0],[0,1],[1,1],[2,1],[3,1],[1,2]], // cross
+    [[0,0],[1,0],[2,0],[3,0],[1,1],[1,2]], // T
+    [[0,1],[1,1],[2,1],[3,1],[4,1],[5,1]], // invalid line
+    [[0,0],[0,1],[0,2],[1,2],[2,2],[2,3]], // L valid
+  ];
+  const c=cfgs[type%4];
+  const colors=['#4361ee','#f72585','#06d6a0','#ffbe0b','#7209b7','#fb5607'];
+  const maxX=Math.max(...c.map(p=>p[0]))+1, maxY=Math.max(...c.map(p=>p[1]))+1;
+  const sq=44, pad=10, w=maxX*sq+pad*2, h=maxY*sq+pad*2;
+  const rects=c.map((p,i)=>`<rect x="${pad+p[0]*sq}" y="${pad+p[1]*sq}" width="${sq-3}" height="${sq-3}" fill="${colors[i]}" rx="5" stroke="#fff" stroke-width="2"/>`).join('');
+  return `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w,260)}" height="${Math.min(h,200)}">${rects}</svg>`;
+}
+
+function svgGrid(rows,cols,hi=[]){
+  const sz=38,pad=8,w=cols*sz+pad*2,h=rows*sz+pad*2;
+  let g='';
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    const f=hi.includes(`${r},${c}`)?'#4361ee':'#eef2ff';
+    g+=`<rect x="${pad+c*sz}" y="${pad+r*sz}" width="${sz-2}" height="${sz-2}" fill="${f}" rx="4" stroke="#c7d2fe" stroke-width="1.5"/>`;
+  }
+  return `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w,280)}" height="${Math.min(h,200)}">${g}</svg>`;
+}
+
+function svgLShape(cells){
+  const sz=38,pad=8;
+  const maxC=Math.max(...cells.map(c=>c[1]))+1,maxR=Math.max(...cells.map(c=>c[0]))+1;
+  const w=maxC*sz+pad*2,h=maxR*sz+pad*2;
+  const rs=cells.map(([r,c])=>`<rect x="${pad+c*sz}" y="${pad+r*sz}" width="${sz-2}" height="${sz-2}" fill="#4361ee" rx="4" stroke="#fff" stroke-width="1.5"/>`).join('');
+  return `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w,260)}" height="${Math.min(h,200)}">${rs}</svg>`;
+}
+
+function svgEuler(a,b,both,total){
+  const ao=a-both,bo=b-both,neither=Math.max(0,total-a-b+both);
+  return `<svg viewBox="0 0 300 190" width="280" height="180">
+    <ellipse cx="118" cy="95" rx="88" ry="64" fill="rgba(67,97,238,.15)" stroke="#4361ee" stroke-width="2.5"/>
+    <ellipse cx="182" cy="95" rx="88" ry="64" fill="rgba(247,37,133,.15)" stroke="#f72585" stroke-width="2.5"/>
+    <text x="72" y="92" font-size="26" font-weight="800" fill="#4361ee" text-anchor="middle" font-family="Nunito">${ao}</text>
+    <text x="150" y="92" font-size="26" font-weight="800" fill="#7c3aed" text-anchor="middle" font-family="Nunito">${both}</text>
+    <text x="228" y="92" font-size="26" font-weight="800" fill="#f72585" text-anchor="middle" font-family="Nunito">${bo}</text>
+    <text x="72" y="112" font-size="10" fill="#4361ee" text-anchor="middle" font-family="Nunito">тек А / только А</text>
+    <text x="150" y="112" font-size="10" fill="#7c3aed" text-anchor="middle" font-family="Nunito">А∩В</text>
+    <text x="228" y="112" font-size="10" fill="#f72585" text-anchor="middle" font-family="Nunito">тек В / только В</text>
+    ${neither>0?`<text x="150" y="170" font-size="12" fill="#888" text-anchor="middle" font-family="Nunito">Ешқайсысы / Никто: ${neither}</text>`:''}
+  </svg>`;
+}
+
+function svgSquareGrid(n){
+  const sz=46,pad=8,w=n*sz+pad*2,h=n*sz+pad*2;
+  let g='';
+  for(let r=0;r<n;r++) for(let c=0;c<n;c++)
+    g+=`<rect x="${pad+c*sz}" y="${pad+r*sz}" width="${sz-2}" height="${sz-2}" fill="#eef2ff" rx="4" stroke="#818cf8" stroke-width="1.5"/>`;
+  return `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w,280)}" height="${Math.min(h,280)}">${g}</svg>`;
+}
+
+function svgPattern(items,missing_idx){
+  const sz=50,pad=8,n=items.length,w=n*sz+pad*2+40,h=sz+pad*2;
+  const shapes=items.map((v,i)=>{
+    const cx=pad+i*sz+sz/2, cy=pad+sz/2;
+    if(v==='?') return `<rect x="${cx-20}" y="${cy-20}" width="40" height="40" fill="none" stroke="#4361ee" stroke-width="2.5" stroke-dasharray="5,3" rx="6"/>
+      <text x="${cx}" y="${cy+5}" font-size="18" font-weight="800" fill="#4361ee" text-anchor="middle" font-family="Nunito">?</text>`;
+    if(v==='▲') return `<polygon points="${cx},${cy-20} ${cx+22},${cy+16} ${cx-22},${cy+16}" fill="#4361ee"/>`;
+    if(v==='●') return `<circle cx="${cx}" cy="${cy}" r="18" fill="#f72585"/>`;
+    if(v==='■') return `<rect x="${cx-18}" y="${cy-18}" width="36" height="36" fill="#06d6a0" rx="4"/>`;
+    if(v==='◆') return `<polygon points="${cx},${cy-20} ${cx+18},${cy} ${cx},${cy+20} ${cx-18},${cy}" fill="#ffbe0b"/>`;
+    return `<text x="${cx}" y="${cy+8}" font-size="22" font-weight="800" fill="#1a1a2e" text-anchor="middle" font-family="Nunito">${v}</text>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w,320)}" height="${sz+pad*2}">${shapes}</svg>`;
+}
+
+function svgLogicTable(rows){
+  const cw=90, rh=36, pad=8;
+  const cols=rows[0].length, rcount=rows.length;
+  const w=cols*cw+pad*2, h=rcount*rh+pad*2;
+  let g='';
+  rows.forEach((row,ri)=>{
+    row.forEach((cell,ci)=>{
+      const x=pad+ci*cw, y=pad+ri*rh;
+      const isHead=ri===0;
+      g+=`<rect x="${x}" y="${y}" width="${cw-1}" height="${rh-1}" fill="${isHead?'#4361ee':'#eef2ff'}" rx="4" stroke="#c7d2fe" stroke-width="1"/>
+      <text x="${x+cw/2}" y="${y+rh/2+5}" font-size="12" font-weight="${isHead?800:600}" fill="${isHead?'#fff':'#1a1a2e'}" text-anchor="middle" font-family="Nunito">${cell}</text>`;
+    });
+  });
+  return `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w,340)}" height="${h}">${g}</svg>`;
+}
+
+// ============================================================
+// QUESTIONS DB (bilingual)
+// ============================================================
+// QUESTIONS loaded from external JS files (questions1.js, questions2.js, questions3.js)
+// Merged at runtime into QUESTIONS array
+var QUESTIONS = [];
+
+
+// ============================================================
+const AVATARS=['🦁','🐯','🦊','🐺','🦅','🦋','🐬','🦄','🐲','🤖','👨‍🚀','🧙'];
+let currentScreen='setup';
+let profiles=[];
+let activeProfileIdx=-1;
+let selectedTopics=[];
+let currentTest=[];
+let currentIdx=0;
+let answers=[];
+let timerInterval=null;
+let timerLeft=0;
+let timerTotal=0;
+// БИЛ: 110 мин / 60 сұрақ = ~1.833 мин/сұрақ
+const BIL_SEC_PER_Q = Math.round(110 * 60 / 60); // 110 сек/сұрақ
+
+function getActiveProfile(){ return profiles[activeProfileIdx]||null; }
+
+function loadAll(){
+  try{
+    const d=JSON.parse(localStorage.getItem('bil_v2')||'{}');
+    profiles=d.profiles||[];
+    activeProfileIdx=d.activeIdx??-1;
+    lang=d.lang||'kk';
+  } catch(e){}
+}
+function saveAll(){
+  localStorage.setItem('bil_v2',JSON.stringify({profiles,activeIdx:activeProfileIdx,lang}));
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+const SCREENS=['setup','profiles','home','test','result','progress','parent'];
+function showScreen(name){
+  SCREENS.forEach(s=>document.getElementById('screen-'+s).classList.toggle('hidden',s!==name));
+  currentScreen=name;
+  ['home','progress','parent'].forEach(id=>{
+    document.getElementById('nav-'+id)?.classList.toggle('active',name===id);
+  });
+  if(name==='home') renderHome();
+  if(name==='profiles') renderProfilesList();
+  if(name==='progress') renderProgress();
+  if(name==='parent') renderParent();
+  updateHeaderProfile();
+}
+
+function updateHeaderProfile(){
+  const p=getActiveProfile();
+  document.getElementById('header-avatar').textContent=p?p.avatar:'👤';
+  document.getElementById('header-name').textContent=p?p.name:'—';
+}
+
+// ============================================================
+// PROFILE MANAGEMENT
+// ============================================================
+function renderAvatarGrid(){
+  document.getElementById('avatar-grid').innerHTML=AVATARS.map((a,i)=>
+    `<div class="avatar-opt${i===0?' sel':''}" onclick="selectAvatar(this,'${a}')">${a}</div>`
+  ).join('');
+}
+function selectAvatar(el,av){
+  document.querySelectorAll('.avatar-opt').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  el.dataset.av=av;
+}
+function getSelectedAvatar(){
+  return document.querySelector('.avatar-opt.sel')?.textContent||'🦁';
+}
+function createProfile(){
+  const name=document.getElementById('setup-name').value.trim();
+  if(!name) return;
+  const avatar=getSelectedAvatar();
+  profiles.push({name,avatar,topicStats:{},weakTopics:[],history:[],totalTests:0,bestScore:0});
+  activeProfileIdx=profiles.length-1;
+  saveAll();
+  showScreen('home');
+}
+function renderProfilesList(){
+  const list=document.getElementById('profiles-list');
+  if(profiles.length===0){
+    list.innerHTML=`<div class="empty-state"><span>👤</span>${t('no-data')}</div>`;
+    return;
+  }
+  list.innerHTML=profiles.map((p,i)=>{
+    const total=p.totalTests||0;
+    const best=p.bestScore||0;
+    return `<div class="profile-row${i===activeProfileIdx?' sel':''}" onclick="selectProfile(${i})">
+      <div class="pr-avatar">${p.avatar}</div>
+      <div>
+        <div class="pr-name">${p.name}</div>
+        <div class="pr-stats">${total} тест · ${lang==='kk'?'Ең жақсы':'Лучший'}: ${best}%</div>
+      </div>
+      <button class="pr-del" onclick="event.stopPropagation();deleteProfile(${i})">🗑</button>
+    </div>`;
+  }).join('');
+}
+function selectProfile(i){
+  activeProfileIdx=i;
+  saveAll();
+  showScreen('home');
+}
+function deleteProfile(i){
+  if(!confirm(lang==='kk'?'Профильді жою?':'Удалить профиль?')) return;
+  profiles.splice(i,1);
+  if(activeProfileIdx>=profiles.length) activeProfileIdx=profiles.length-1;
+  saveAll();
+  if(profiles.length===0) showScreen('setup');
+  else renderProfilesList();
+}
+
+// ============================================================
+// HOME
+// ============================================================
+function renderHome(){
+  const p=getActiveProfile();
+  document.getElementById('home-avatar').textContent=p?p.avatar:'🧠';
+  document.getElementById('home-greeting').textContent=`${t('greeting')}, ${p?p.name:''}! 👋`;
+  const grid=document.getElementById('topic-grid');
+  const topics=getTopics();
+  grid.innerHTML=topics.map(tp=>{
+    const stats=p?.topicStats?.[tp.id]||{total:0,correct:0};
+    const pct=stats.total>0?Math.round(stats.correct/stats.total*100):0;
+    const isWeak=p?.weakTopics?.includes(tp.id);
+    const fc=pct<50?'low':pct<75?'mid':'';
+    return `<div class="topic-card${selectedTopics.includes(tp.id)?' selected':''}" onclick="toggleTopic('${tp.id}')">
+      ${isWeak?`<span class="weak-badge">${lang==='kk'?'Әлсіз':'Слабая'}</span>`:''}
+      <div class="topic-icon">${tp.icon}</div>
+      <div class="topic-name">${tp.name}</div>
+      <div class="topic-desc">${tp.desc}</div>
+      ${stats.total>0?`<div class="score-bar"><div class="score-fill ${fc}" style="width:${pct}%"></div></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:3px">${stats.correct}/${stats.total}</div>`:''}
+    </div>`;
+  }).join('');
+}
+function toggleTopic(id){
+  const i=selectedTopics.indexOf(id);
+  if(i>=0) selectedTopics.splice(i,1); else selectedTopics.push(id);
+  document.getElementById('btn-start-sel').disabled=selectedTopics.length===0;
+  renderHome();
+}
+function startSelectedTopics(){ startTest(selectedTopics); }
+
+// ============================================================
+// TIMER — runs ONCE for the whole test
+// ============================================================
+function startTestTimer(numQuestions){
+  clearInterval(timerInterval);
+  timerTotal = numQuestions * BIL_SEC_PER_Q; // ~110 сек на вопрос (БИЛ пропорция)
+  timerLeft  = timerTotal;
+  updateTimerUI();
+  timerInterval=setInterval(()=>{
+    timerLeft--;
+    updateTimerUI();
+    if(timerLeft<=0){ clearInterval(timerInterval); timeoutWholeTest(); }
+  },1000);
+}
+function fmtTime(sec){
+  const m=Math.floor(sec/60), s=sec%60;
+  return `${m}:${s.toString().padStart(2,'0')}`;
+}
+function updateTimerUI(){
+  const tt=document.getElementById('timer-text');
+  const tb=document.getElementById('timer-bar');
+  if(!tt||!tb) return;
+  const pct=(timerLeft/timerTotal)*100;
+  const warn=pct<=25, danger=pct<=10;
+  tt.innerHTML=`⏱ ${fmtTime(timerLeft)} <span style="font-size:11px;font-weight:600;color:var(--text3)">/ ${fmtTime(timerTotal)}</span>`;
+  tt.className='timer-text'+(danger?' danger pulse':warn?' warn':'');
+  tb.style.width=pct+'%';
+  tb.className='timer-bar'+(danger?' danger':warn?' warn':'');
+}
+function timeoutWholeTest(){
+  // Auto-finish: unanswered questions counted as wrong
+  while(currentIdx<currentTest.length){
+    const q=currentTest[currentIdx];
+    // If current question not yet answered — mark timeout
+    if(answers.length<=currentIdx){
+      answers.push({qid:q.id,topic:q.topic,chosen:-1,correct:q.ans,isCorrect:false,timedOut:true});
+      updateProfileStats(q.topic,false);
+    }
+    currentIdx++;
+  }
+  showResults();
+}
+
+// ============================================================
+// TEST
+// ============================================================
+function buildTest(topics, count){
+  const n = count||10;
+  const ids=topics==='mixed'?getTopics().map(t=>t.id):(Array.isArray(topics)?topics:[topics]);
+  const pool=QUESTIONS.filter(q=>ids.includes(q.topic));
+  return [...pool].sort(()=>Math.random()-.5).slice(0,Math.min(n,pool.length));
+}
+// БИЛ daily test: 50 logic + 10 reading = 60 questions
+function startDailyTest(){
+  const logicIds=['cubes','nets','fill','perim','squares','euler','logic','pattern','math'];
+  const logicPool=QUESTIONS.filter(q=>logicIds.includes(q.topic));
+  const readingPool=QUESTIONS.filter(q=>q.topic==='reading');
+  const logic50=[...logicPool].sort(()=>Math.random()-.5).slice(0,Math.min(50,logicPool.length));
+  const read10=[...readingPool].sort(()=>Math.random()-.5).slice(0,Math.min(10,readingPool.length));
+  currentTest=[...logic50,...read10].sort(()=>Math.random()-.5);
+  if(!currentTest.length){ alert('Сұрақ жоқ'); return; }
+  currentIdx=0; answers=[]; selectedTopics=[];
+  showScreen('test');
+  renderQuestion();
+  startTestTimer(currentTest.length);
+}
+function startTest(topics, count){
+  currentTest=buildTest(topics, count||10);
+  if(!currentTest.length){ alert('Сұрақ жоқ / Нет вопросов'); return; }
+  currentIdx=0; answers=[]; selectedTopics=[];
+  const selBtn=document.getElementById('btn-start-sel');
+  if(selBtn) selBtn.disabled=true;
+  showScreen('test');
+  renderQuestion();
+  startTestTimer(currentTest.length);
+}
+function renderQuestion(){
+  const q=currentTest[currentIdx];
+  const total=currentTest.length;
+  // Progress
+  document.getElementById('progress-fill').style.width=(currentIdx/total*100)+'%';
+  document.getElementById('progress-text').textContent=`${currentIdx+1}/${total}`;
+  // Badges
+  const topics=getTopics();
+  const tp=topics.find(t=>t.id===q.topic)||{name:'',icon:''};
+  document.getElementById('q-topic-badge').textContent=tp.icon+' '+tp.name;
+  const dm={easy:'diff-easy',medium:'diff-medium',hard:'diff-hard'};
+  const db=document.getElementById('q-diff-badge');
+  db.textContent=t('diff-'+q.diff); db.className='diff-badge '+(dm[q.diff]||'');
+  // Text
+  document.getElementById('q-text').textContent=q.q[lang]||q.q.kk;
+  // Drawing
+  const da=document.getElementById('drawing-area');
+  if(q.draw){ da.style.display='flex'; da.innerHTML=q.draw(); }
+  else { da.style.display='none'; }
+  // Options
+  const og=document.getElementById('opts-grid');
+  const letters=['A','B','C','D'];
+  const opts=(q.opts[lang]||q.opts.kk);
+  og.innerHTML=opts.map((o,i)=>`<button class="opt-btn" onclick="selectAnswer(${i})" id="opt-${i}">
+    <span class="opt-letter">${letters[i]}</span>${o}</button>`).join('');
+  // Reset
+  document.getElementById('exp-box').classList.add('hidden');
+  document.getElementById('btn-next').classList.add('hidden');
+  document.getElementById('btn-finish').classList.add('hidden');
+  // Timer continues running — no per-question reset
+}
+function selectAnswer(chosen){
+  // Timer keeps running during the whole test
+  const q=currentTest[currentIdx];
+  const correct=q.ans;
+  const isCorrect=chosen===correct;
+  ['opt-0','opt-1','opt-2','opt-3'].forEach(id=>{ const b=document.getElementById(id); if(b) b.disabled=true; });
+  document.getElementById(`opt-${correct}`)?.classList.add('correct');
+  if(!isCorrect) document.getElementById(`opt-${chosen}`)?.classList.add('wrong');
+  answers.push({qid:q.id,topic:q.topic,chosen,correct,isCorrect,timedOut:false});
+  updateProfileStats(q.topic,isCorrect);
+  const box=document.getElementById('exp-box');
+  box.classList.remove('hidden');
+  box.className=`exp-box ${isCorrect?'ok':'ng'}`;
+  box.innerHTML=`<div class="exp-title">${isCorrect?'✅ '+t('correct'):'❌ '+t('wrong')}</div><div class="exp-text">${q.exp[lang]||q.exp.kk}</div>`;
+  const isLast=currentIdx>=currentTest.length-1;
+  if(isLast) document.getElementById('btn-finish').classList.remove('hidden');
+  else document.getElementById('btn-next').classList.remove('hidden');
+}
+function updateProfileStats(topicId,isCorrect){
+  const p=getActiveProfile();
+  if(!p) return;
+  if(!p.topicStats) p.topicStats={};
+  if(!p.topicStats[topicId]) p.topicStats[topicId]={total:0,correct:0};
+  p.topicStats[topicId].total++;
+  if(isCorrect) p.topicStats[topicId].correct++;
+  saveAll();
+}
+function nextQuestion(){ currentIdx++; renderQuestion(); }
+
+// ============================================================
+// RESULTS
+// ============================================================
+function showResults(){
+  clearInterval(timerInterval);
+  const timeSpent = timerTotal - timerLeft; // seconds used
+  const total=answers.length;
+  const correct=answers.filter(a=>a.isCorrect).length;
+  const pct=Math.round(correct/total*100);
+  const timeouts=answers.filter(a=>a.timedOut).length;
+  const wrongTopics=[...new Set(answers.filter(a=>!a.isCorrect).map(a=>a.topic))];
+
+  const p=getActiveProfile();
+  if(p){
+    if(!p.weakTopics) p.weakTopics=[];
+    wrongTopics.forEach(tp=>{
+      const s=p.topicStats?.[tp];
+      if(s&&s.total>=4&&s.correct/s.total<0.5&&!p.weakTopics.includes(tp)) p.weakTopics.push(tp);
+    });
+    if(!p.history) p.history=[];
+    p.history.unshift({date:new Date().toLocaleDateString(lang==='kk'?'kk-KZ':'ru-RU'),correct,total,pct,weakTopics:wrongTopics,timeouts});
+    if(p.history.length>30) p.history=p.history.slice(0,30);
+    p.totalTests=(p.totalTests||0)+1;
+    if(pct>=(p.bestScore||0)) p.bestScore=pct;
+    saveAll();
+  }
+
+  const emoji=pct>=90?'🏆':pct>=70?'🌟':pct>=50?'💪':'📚';
+  const msgs={kk:{90:'Тамаша!',70:'Жақсы!',50:'Жаттыға бер!',0:'Қайта оқи кет!'},
+              ru:{90:'Отлично!',70:'Хорошо!',50:'Нужно тренироваться!',0:'Повторяй ещё!'}};
+  const mset=msgs[lang];
+  const msg=pct>=90?mset[90]:pct>=70?mset[70]:pct>=50?mset[50]:mset[0];
+  const timeLabel=lang==='kk'?'Уақыт':'Время';
+  document.getElementById('result-hero').innerHTML=`
+    <div class="score-circle score-circle-bg animate-pop" style="--pct:${pct}">
+      <div class="score-number">${pct}%</div>
+      <div class="score-label">${correct}/${total}</div>
+    </div>
+    <div class="result-title">${emoji} ${msg}</div>
+    <div class="result-sub">${correct} ${lang==='kk'?'дұрыс':'правильно'}, ${total-correct} ${lang==='kk'?'қате':'ошибок'}${timeouts>0?`, ${timeouts} ⏰`:''}
+    </div>
+    <div style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:var(--bg);border-radius:30px;padding:6px 16px;font-size:13px;font-weight:700;color:var(--text2)">
+      ⏱ ${timeLabel}: <b style="color:var(--primary)">${fmtTime(timeSpent)}</b>
+      <span style="color:var(--text3);font-weight:400">/ ${fmtTime(timerTotal)}</span>
+    </div>`;
+
+  const topics=getTopics();
+  const weakBlock=document.getElementById('result-weak');
+  if(wrongTopics.length>0){
+    weakBlock.style.display='';
+    weakBlock.innerHTML=`<div class="weak-box"><h3>${lang==='kk'?'⚠️ Қайталау керек:':'⚠️ Нужно повторить:'}</h3>
+      ${wrongTopics.map(id=>{const tp=topics.find(t=>t.id===id);return tp?`<span class="weak-chip">${tp.icon} ${tp.name}</span>`:''}).join('')}
+    </div>`;
+    document.getElementById('btn-retry').style.display='';
+    document.getElementById('btn-retry')._weak=wrongTopics;
+  } else {
+    weakBlock.style.display='none';
+    document.getElementById('btn-retry').style.display='none';
+  }
+
+  document.getElementById('rv-grid').innerHTML=answers.map((a,i)=>{
+    const q=currentTest[i];
+    const tp=topics.find(t=>t.id===q?.topic);
+    const opts=q.opts[lang]||q.opts.kk;
+    return `<div class="rv-item ${a.timedOut?'rv-timeout':a.isCorrect?'rv-correct':'rv-wrong'}">
+      <div class="rv-q">${a.timedOut?'⏰':a.isCorrect?'✅':'❌'} ${(q.q[lang]||q.q.kk).slice(0,65)}…</div>
+      <div class="rv-ans">${tp?.icon} ${tp?.name||''} · ${lang==='kk'?'Дұрыс':'Верно'}: ${opts[q.ans]}${!a.isCorrect&&!a.timedOut?` · ${lang==='kk'?'Сен':'Ты'}: ${opts[a.chosen]}`:''}</div>
+    </div>`;
+  }).join('');
+  showScreen('result');
+}
+function retryWeak(){
+  const w=document.getElementById('btn-retry')._weak||[];
+  if(w.length) startTest(w);
+}
+
+// ============================================================
+// PROGRESS
+// ============================================================
+function renderProgress(){
+  const p=getActiveProfile();
+  const topics=getTopics();
+  const pc=document.getElementById('progress-content');
+  const hc=document.getElementById('history-content');
+  if(!p||Object.keys(p.topicStats||{}).length===0){
+    pc.innerHTML=`<div class="empty-state"><span>🧠</span>${t('empty-tests')}</div>`;
+  } else {
+    pc.innerHTML=topics.map(tp=>{
+      const s=p.topicStats?.[tp.id]||{total:0,correct:0};
+      if(!s.total) return '';
+      const pct=Math.round(s.correct/s.total*100);
+      const fc=pct<50?'low':pct<75?'mid':'';
+      const isWeak=p.weakTopics?.includes(tp.id);
+      return `<div class="pt-row">
+        <div class="pt-icon">${tp.icon}</div>
+        <div class="pt-info">
+          <div class="pt-name">${tp.name} ${isWeak?`<span style="color:var(--red);font-size:11px">⚠ ${lang==='kk'?'Әлсіз':'Слабая'}</span>`:''}</div>
+          <div class="pt-stats">${s.correct}/${s.total}</div>
+          <div class="pt-bar"><div class="pt-fill ${fc}" style="width:${pct}%"></div></div>
+        </div>
+        <div class="pt-pct">${pct}%</div>
+      </div>`;
+    }).join('');
+  }
+  const hist=p?.history||[];
+  hc.innerHTML=hist.length?hist.map(r=>`
+    <div class="hist-item">
+      <div>
+        <div class="hist-score" style="color:${r.pct>=70?'var(--green)':r.pct>=50?'var(--yellow)':'var(--red)'}">${r.pct}%</div>
+        <div class="hist-meta">${r.date} · ${r.correct}/${r.total}${r.timeouts>0?` · ⏰${r.timeouts}`:''}</div>
+      </div>
+      ${r.weakTopics?.length?`<div style="font-size:13px">${r.weakTopics.map(id=>topics.find(t=>t.id===id)?.icon||'').join('')}</div>`:'<span style="color:var(--green);font-size:12px;font-weight:700">✅</span>'}
+    </div>`).join(''):`<div class="empty-state"><span>📋</span>${t('empty-tests')}</div>`;
+}
+
+// ============================================================
+// PARENT ANALYTICS
+// ============================================================
+let parentSelectedChild=0;
+function renderParent(){
+  // Child selector
+  const cs=document.getElementById('child-selector');
+  cs.innerHTML=profiles.map((p,i)=>
+    `<div class="child-chip${i===parentSelectedChild?' active':''}" onclick="selectChild(${i})">${p.avatar} ${p.name}</div>`
+  ).join('');
+  if(profiles.length===0){
+    document.getElementById('parent-analytics').innerHTML=`<div class="empty-state"><span>👤</span>${t('no-data')}</div>`;
+    return;
+  }
+  renderParentFor(parentSelectedChild);
+}
+function selectChild(i){
+  parentSelectedChild=i;
+  document.querySelectorAll('.child-chip').forEach((el,idx)=>el.classList.toggle('active',idx===i));
+  renderParentFor(i);
+}
+function renderParentFor(i){
+  const p=profiles[i];
+  if(!p){ document.getElementById('parent-analytics').innerHTML=''; return; }
+  const hist=p.history||[];
+  const total=p.totalTests||0;
+  const avg=hist.length?Math.round(hist.reduce((s,h)=>s+h.pct,0)/hist.length):0;
+  const best=p.bestScore||0;
+  const topics=getTopics();
+
+  // Find weakest topic
+  let worstTopic=null, worstPct=101;
+  topics.forEach(tp=>{
+    const s=p.topicStats?.[tp.id];
+    if(s&&s.total>=3){
+      const pct=Math.round(s.correct/s.total*100);
+      if(pct<worstPct){ worstPct=pct; worstTopic=tp; }
+    }
+  });
+
+  // Trend (last 7)
+  const trend=hist.slice(0,7).reverse();
+  const trendBars=trend.map(h=>{
+    const pct=h.pct;
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center">
+      <div class="trend-col" style="height:${Math.max(pct*.7,4)}px;background:${pct>=70?'var(--green)':pct>=50?'var(--yellow)':'var(--red)'}"></div>
+      <div class="trend-label">${pct}%</div>
+    </div>`;
+  }).join('');
+
+  // Recommendation
+  let rec='';
+  if(worstTopic){
+    rec=lang==='kk'
+      ?`«${worstTopic.name}» тақырыбы бойынша нәтиже ${worstPct}%. Осы тақырыпты күн сайын жаттықтыруды ұсынамыз.`
+      :`По теме «${worstTopic.name}» результат ${worstPct}%. Рекомендуем ежедневно тренировать эту тему.`;
+  } else {
+    rec=lang==='kk'?'Барлық тақырыптар бойынша жақсы нәтиже! Жалғастыр! 🎉':'Хорошие результаты по всем темам! Продолжай! 🎉';
+  }
+
+  // Topic breakdown
+  const breakdown=topics.map(tp=>{
+    const s=p.topicStats?.[tp.id]||{total:0,correct:0};
+    const pct=s.total?Math.round(s.correct/s.total*100):0;
+    const fc=pct<50?'low':pct<75?'mid':'';
+    return `<div class="pt-row">
+      <div class="pt-icon">${tp.icon}</div>
+      <div class="pt-info">
+        <div class="pt-name">${tp.name}</div>
+        <div class="pt-stats">${s.total?`${s.correct}/${s.total}`:(lang==='kk'?'Өтпеген':'Не пройдено')}</div>
+        ${s.total?`<div class="pt-bar"><div class="pt-fill ${fc}" style="width:${pct}%"></div></div>`:''}
+      </div>
+      <div class="pt-pct">${s.total?pct+'%':'—'}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('parent-analytics').innerHTML=`
+    <div class="analytics-grid">
+      <div class="an-card"><div class="an-num">${total}</div><div class="an-label">${t('total-tests')}</div></div>
+      <div class="an-card"><div class="an-num">${avg}%</div><div class="an-label">${t('avg-score')}</div></div>
+      <div class="an-card"><div class="an-num">${best}%</div><div class="an-label">${t('best-score')}</div></div>
+    </div>
+    ${trend.length>0?`
+    <div style="margin-bottom:14px">
+      <div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">${lang==='kk'?'📈 Соңғы тесттер':'📈 Последние тесты'}</div>
+      <div class="trend-bar">${trendBars}</div>
+    </div>`:''}
+    <div style="margin-bottom:14px">
+      <div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">${lang==='kk'?'📚 Тақырыптар бойынша':'📚 По темам'}</div>
+      ${breakdown}
+    </div>
+    <div class="recommendation">
+      <div class="rec-title">💡 ${t('recommend')}</div>
+      <div class="rec-text">${rec}</div>
+    </div>`;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+// Merge all question parts from external files
+if(typeof QUESTIONS_PART1!=='undefined') QUESTIONS=QUESTIONS.concat(QUESTIONS_PART1);
+if(typeof QUESTIONS_PART2!=='undefined') QUESTIONS=QUESTIONS.concat(QUESTIONS_PART2);
+if(typeof QUESTIONS_PART3!=='undefined') QUESTIONS=QUESTIONS.concat(QUESTIONS_PART3);
+// Shuffle to mix topics
+QUESTIONS.sort(()=>Math.random()-.5);
+console.log('✅ Loaded',QUESTIONS.length,'questions');
+
+loadAll();
+renderAvatarGrid();
+document.getElementById('lang-kk').classList.toggle('active', lang==='kk');
+document.getElementById('lang-ru').classList.toggle('active', lang==='ru');
+applyTranslations();
+
+if(profiles.length>0 && activeProfileIdx>=0 && activeProfileIdx<profiles.length){
+  showScreen('home');
+} else {
+  showScreen('setup');
+}
+</script>
+</body>
+</html>
